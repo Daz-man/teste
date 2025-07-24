@@ -1,0 +1,587 @@
+{
+  "name": "FB Cadastro + N8N + Excel + CRM + Email + Whats",
+  "nodes": [
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{$json[\"query\"][\"hub.challenge\"]}}",
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        440
+      ],
+      "id": "eb9af046-a289-4e32-bcf9-e54dbf55854a"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "EMAIL",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "name": "NOME",
+              "value": "={{ $json.full_name }}"
+            },
+            {
+              "name": "DATA",
+              "value": "={{$node[\"Date & Time\"].json[\"data\"]}}"
+            },
+            {
+              "name": "WHATSAPP",
+              "value": "={{ $json.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2340,
+        560
+      ],
+      "id": "9c58a73b-4099-4279-a2d0-19fd46c0185f"
+    },
+    {
+      "parameters": {
+        "value": "={{$json[\"created_time\"]}}",
+        "custom": true,
+        "toFormat": "DD/MM/YYYY HH:mm",
+        "options": {
+          "fromTimezone": "America/Sao_Paulo"
+        }
+      },
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 1,
+      "position": [
+        2186,
+        560
+      ],
+      "id": "4fbe9da4-69bb-4377-975b-ff12cf2c269b"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v19.0/{{$json[\"body\"][\"entry\"][0][\"changes\"][0][\"value\"][\"leadgen_id\"]}}",
+        "options": {},
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "access_token",
+              "value": "<SEU TOKEN DE ACESSO>"
+            }
+          ]
+        }
+      },
+      "name": "Obter dados lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [
+        1860,
+        560
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "id": "c64e1b75-2a7a-40ee-95c3-0028802ba14a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"query\"][\"hub.verify_token\"]}}",
+              "value2": "va1234"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1026,
+        560
+      ],
+      "id": "be64342f-739c-42d5-803f-78142de85fb9"
+    },
+    {
+      "parameters": {},
+      "name": "NoOp",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1286,
+        680
+      ],
+      "id": "29c5271e-1494-4296-9a07-98952c19ec97"
+    },
+    {
+      "parameters": {
+        "content": "\n# Cadastrar **webhook**\n",
+        "height": 460,
+        "width": 726.4033082417657
+      },
+      "name": "Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        760,
+        380
+      ],
+      "id": "221f1ed2-df4f-4342-820a-3807a53555af"
+    },
+    {
+      "parameters": {
+        "content": "# **FB LEADS ADS > N8N > SHEETS > HUBSPOT > EMAIL > WHATS 🚀**\n",
+        "height": 577.9996621392863,
+        "width": 1069.6724862418132,
+        "color": 4
+      },
+      "name": "Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1646,
+        380
+      ],
+      "id": "ed83d14c-a6b7-4265-bba3-0452d69a03fc"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d09dfb46-3dfd-43b3-a61b-f28c8cec75da",
+        "options": {}
+      },
+      "name": "Webhook cadastros",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        1686,
+        560
+      ],
+      "webhookId": "523d849e-a2ec-4146-a920-3f4146779008",
+      "id": "66f805e5-edec-4d6b-884e-a71fa8057678"
+    },
+    {
+      "parameters": {
+        "functionCode": "for (i in item.field_data) {\n  item[item.field_data[i].name] = item.field_data[i].values[0];\n}\nreturn item;"
+      },
+      "name": "Cria campos com o nome",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        2026,
+        560
+      ],
+      "id": "258666ae-8376-46b7-beb7-69a7a20244c4"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "141s35J533hsGukAa4N_q0b_jjaBRGqjCJIslETiNprA",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/141s35J533hsGukAa4N_q0b_jjaBRGqjCJIslETiNprA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DATA": "={{ $json.DATA }}",
+            "NOME": "={{ $json.NOME }}",
+            "EMAIL": "={{ $json.EMAIL }}",
+            "WHATSAPP": "={{ $json.WHATSAPP }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "DATA",
+              "displayName": "DATA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NOME",
+              "displayName": "NOME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EMAIL",
+              "displayName": "EMAIL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "WHATSAPP",
+              "displayName": "WHATSAPP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d964591a-382a-49d1-8154-d87e7d145727",
+      "name": "Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2506,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "var name =  $json.NOME;\n\nif (name != null) {\n  var fname = name.split(' ');\n  $json[\"nome\"] = fname[0];\n  if (fname.length > 1) {\n    $json[\"sobrenome\"] = fname.slice(1).join(' ');\n  } else {\n    $json[\"sobrenome\"] = \"\";\n  }\n}\n\nreturn {\n  json: $json\n};\n"
+      },
+      "id": "480b2449-565d-41f3-9447-847440c19315",
+      "name": "Retorna nome e sobrenome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        1706,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "appToken",
+        "resource": "contact",
+        "email": "={{ $json.EMAIL }}",
+        "additionalFields": {
+          "contactOwner": 741047180,
+          "firstName": "={{ $('Retorna nome e sobrenome').item.json[\"nome\"] }}",
+          "lastName": "={{ $('Retorna nome e sobrenome').item.json[\"sobrenome\"] }}",
+          "phoneNumber": "={{ $json.WHATSAPP }}"
+        }
+      },
+      "id": "599d1c59-7c48-4f32-9821-63e2bf8b609c",
+      "name": "Criar ou atualizar contato",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [
+        1866,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "URL API",
+              "value": "<SUA URL EVO>"
+            },
+            {
+              "name": "APIKEY",
+              "value": "<SUA API KEY EVO>"
+            },
+            {
+              "name": "Nome da Instancia",
+              "value": "<SUA INSTANCIA EVO>"
+            },
+            {
+              "name": "Telefone",
+              "value": "={{ $('Retorna nome e sobrenome').item.json.WHATSAPP }}"
+            },
+            {
+              "name": "Nome",
+              "value": "={{ $('Retorna nome e sobrenome').item.json.NOME }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c294fe6d-dc00-4a1f-b585-e66c11085382",
+      "name": "EvolutionAPI",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        2186,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node[\"EvolutionAPI\"].json[\"URL API\"] }}/message/sendText/{{ $node [\"EvolutionAPI\"].json['Nome da Instancia'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $node[\"EvolutionAPI\"].json.APIKEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $json.Telefone }}\",\n  \"options\": {\n    \"delay\": 0,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"Olá, {{ $('Set').item.json.NOME }}, tudo bem? <SEU TEXTO>\"\n  }\n} ",
+        "options": {}
+      },
+      "id": "e5b2304c-9104-4331-a01e-7263660b0a1e",
+      "name": "Enviar Mensagem WhatsApp Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2340,
+        760
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $node[\"EvolutionAPI\"].json[\"URL API\"] }}/message/sendText/{{ $node [\"EvolutionAPI\"].json['Nome da Instancia'] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $node[\"EvolutionAPI\"].json.APIKEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('EvolutionAPI').item.json.Telefone }}\",\n  \"options\": {\n    \"delay\": 50,\n    \"presence\": \"composing\"\n  },\n  \"textMessage\": {\n    \"text\": \"{{ $('Set').item.json.NOME }}, <SEU TEXTO>\"\n  }\n}\n",
+        "options": {}
+      },
+      "id": "77c42bce-735e-4432-801d-ec0dd4a07ca7",
+      "name": "Enviar Mensagem WhatsApp 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2506,
+        760
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "TITULO <aaa@gmail.com>",
+        "toEmail": "={{ $('Retorna nome e sobrenome').item.json[\"EMAIL\"] }}",
+        "subject": "<Descrição do email>",
+        "text": "=SEU TEXTO DE EMAIL",
+        "options": {}
+      },
+      "id": "c2c25a95-035f-45ea-9083-fd8f94a4958f",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        2026,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "path": "d09dfb46-3dfd-43b3-a61b-f28c8cec75da",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        780,
+        560
+      ],
+      "webhookId": "87c70431-85a8-4b19-940c-3901d9cf6b9e",
+      "id": "3e41bd8f-b6a5-4028-8683-bec72969d2d5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obter dados lead": {
+      "main": [
+        [
+          {
+            "node": "Cria campos com o nome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "NoOp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook cadastros": {
+      "main": [
+        [
+          {
+            "node": "Obter dados lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria campos com o nome": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Retorna nome e sobrenome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retorna nome e sobrenome": {
+      "main": [
+        [
+          {
+            "node": "Criar ou atualizar contato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar ou atualizar contato": {
+      "main": [
+        [
+          {
+            "node": "Enviar Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EvolutionAPI": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensagem WhatsApp Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensagem WhatsApp Lead": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensagem WhatsApp 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Email": {
+      "main": [
+        [
+          {
+            "node": "EvolutionAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "18b40a30-3e33-4d90-9531-525e98a733c3",
+  "meta": {
+    "instanceId": "e981586329d93368e468bc8efb27640a193fd7556a094ef140f5826f30fed070"
+  },
+  "id": "x5H4XZjMDxJV26b2",
+  "tags": []
+}

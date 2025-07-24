@@ -1,0 +1,283 @@
+{
+  "name": "Compra Aprovada Kirvano",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e97fc246-a476-4594-a017-282e2d2a5298",
+              "name": "nome",
+              "value": "={{ $json.body.customer.name }}",
+              "type": "string"
+            },
+            {
+              "id": "929916b8-86bf-4a66-8340-b50e711af18e",
+              "name": "produto",
+              "value": "={{ $json.body.products[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "f06b9ff0-7e29-487e-a8dd-30234cfba541",
+              "name": "whatsapp",
+              "value": "={{ $json.body.customer.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "ed0fabeb-d341-4b19-b964-a5558c114560",
+              "name": "email",
+              "value": "={{ $json.body.customer.email }}",
+              "type": "string"
+            },
+            {
+              "id": "52b75e5b-beaa-4722-9dc2-6e2dc2bb9e6b",
+              "name": "Status",
+              "value": "={{ $json.body.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "72ce1ab0-dc1d-4d35-85c7-ad2e760e23c2",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        440,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "9fa44d5c-999d-4f61-9982-b3df0afdbf50",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        460
+      ],
+      "webhookId": "da7ad2c1-7ed6-4c2f-a032-d874051097e9"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "compraaprovada",
+        "options": {}
+      },
+      "id": "b89fb72f-ecab-4c16-9216-c89e435a3bed",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        460
+      ],
+      "webhookId": "57fa96d5-5cf2-42f5-b8b0-5984f4e67270"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c4ce0a0-2668-4893-9b46-8aad0cd5c4d6",
+              "name": "whatsantigo",
+              "value": "={{ $json.whatsapp }}",
+              "type": "string"
+            },
+            {
+              "id": "38c5b718-8728-40dc-9540-5cbfa1a08960",
+              "name": "whatsmodificado",
+              "value": "={{ \"+\" + $json.whatsapp.replace(/\\D/g,'').replace(/^(\\d{2})(\\d{5})(\\d{4})$/, '55$1$2$3').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e124643b-a1b7-4bf3-88e5-0d7bcec87f53",
+      "name": "Adicionar +55 Número",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        620,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "URL/message/sendText/INSTANCIA",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUA APIKEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $json[\"whatsmodificado\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\",\n        \"linkPreview\": false\n    },\n    \"textMessage\": {\n        \"text\": \"Olá, {{ $('Edit Fields').item.json[\"nome\"] }}.\\n\\n🎊 Parabéns você acaba de comprar o *{{ $('Edit Fields').item.json[\"produto\"] }}* todos os dados de acesso foram enviados para o seu e-mail: *{{ $('Webhook').item.json[\"body\"][\"customer\"][\"email\"] }}*\\n\\nTe espero lá!\"\n    }\n}",
+        "options": {}
+      },
+      "id": "52696b63-d12b-4c67-9f25-a3d50828784f",
+      "name": "Evolution API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        460
+      ]
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.botxpert.com.br",
+            "user-agent": "axios/1.7.2",
+            "content-length": "1506",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "baggage": "sentry-environment=production,sentry-public_key=894f284f41064dcaa15f50a785a55ff7,sentry-trace_id=8f4b0f39d4036acb7fbc9e4963c14b90,sentry-sampled=false",
+            "content-type": "application/json",
+            "sentry-trace": "8f4b0f39d4036acb7fbc9e4963c14b90-85af176095d6b964-0",
+            "x-forwarded-for": "44.197.54.29",
+            "x-forwarded-host": "n8n.botxpert.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "b2b80109750f",
+            "x-real-ip": "44.197.54.29"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "SALE_APPROVED",
+            "event_description": "Compra aprovada",
+            "checkout_id": "Q8J1N6K3",
+            "sale_id": "D2RP8RQ7",
+            "payment_method": "CREDIT_CARD",
+            "total_price": "R$ 169,80",
+            "type": "ONE_TIME",
+            "status": "APPROVED",
+            "created_at": "2024-07-30 13:22:32",
+            "customer": {
+              "name": "João da Silva",
+              "document": "23875090127",
+              "email": "exemplo@email.com",
+              "phone_number": "SEUCELULAR"
+            },
+            "payment": {
+              "method": "CREDIT_CARD",
+              "brand": "visa",
+              "installments": 1,
+              "finished_at": "2024-07-30 13:22:47"
+            },
+            "products": [
+              {
+                "id": "3314251c-f3fe-4ad0-8545-d90a12f567d4",
+                "name": "Mercado de Ações no Brasil",
+                "offer_id": "9d1d6f60-46ce-45b5-8a8f-7e96a8540e52",
+                "offer_name": "Mercado de Ações no Brasil",
+                "description": "Conheça os principais conceitos de renda variável e o funcionamento dos mercados",
+                "price": "R$ 119,90",
+                "photo": "https://s3.amazonaws.com/production.kirvano.com/products/c6edf5b4-9bc7-4650-8d98-992a2541901a/cover-1722356552004.jpg",
+                "is_order_bump": false
+              },
+              {
+                "id": "d6c1acea-924e-49f0-bf0f-d6e62760c54b",
+                "name": "Excel para Investidores",
+                "offer_id": "b45719a0-7ac0-4c19-aeb9-a888152ade9d",
+                "offer_name": "Excel para Investidores",
+                "description": "O melhor curso para quem quer começar a investir e ainda aprender a gerenciar sua carteira.",
+                "price": "R$ 49,90",
+                "photo": "https://s3.amazonaws.com/production.kirvano.com/products/cd464135-1b1f-454f-ad41-9f3a02b16a2e/cover-1722356552004.jpg",
+                "is_order_bump": true
+              }
+            ],
+            "utm": {
+              "src": "google",
+              "utm_source": "broadcast",
+              "utm_medium": "email",
+              "utm_campaign": "register",
+              "utm_term": "codes",
+              "utm_content": "link"
+            }
+          },
+          "webhookUrl": "https://n8n.botxpert.com.br/webhook-test/compraaprovada",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Adicionar +55 Número",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Evolution API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adicionar +55 Número": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9162b855-3932-4ca2-8a45-70b55b0cec1e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e7ed61b8b60ef712c05122b9d3a78cf98bea83c0c2a673b02b83b5fcf3e6d008"
+  },
+  "id": "OGDX3IYY0OJYWlMR",
+  "tags": [
+    {
+      "createdAt": "2024-07-17T22:04:31.760Z",
+      "updatedAt": "2024-07-17T22:04:31.760Z",
+      "id": "gywPakqqs6ssxkmw",
+      "name": "kirvano"
+    }
+  ]
+}

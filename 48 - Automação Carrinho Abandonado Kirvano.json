@@ -1,0 +1,336 @@
+{
+  "name": "Carrinho Abandonado Kirvano",
+  "nodes": [
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "3c0474d0-b2eb-411b-86c3-34f319c0c1c4",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -300,
+        1060
+      ],
+      "webhookId": "71a098fa-1eec-426e-b3db-bbe605c9dfa0"
+    },
+    {
+      "parameters": {},
+      "id": "34b4dae4-bb98-43bc-b628-bd332af27a16",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        80,
+        1280
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "4491b0a8-44b6-4f12-8144-05e2779c75f8",
+              "leftValue": "={{ $('Informações').item.json.Status }}",
+              "rightValue": "={{ $('Informações').item.json.Status }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4ea88f1e-c2a8-47a8-b2b8-b15837ec799d",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "URLEVO/message/sendText/INSTANCIA",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "SUAAPIKEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $json[\"whatsmodificado\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\",\n        \"linkPreview\": false\n    },\n    \"textMessage\": {\n        \"text\": \"Olá, {{ $('Informações').item.json.nome }}.\\n\\n🛒 Você deixou o *{{ $('Informações').item.json.produto }}* no carrinho de compras, finalize já a sua compra, antes que a promoção acabe, última semana com esse preço especial 🏃⏰\\n\\n Clique Aqui para Comprar: *{{ $('Informações').item.json.checkoutlink }}*\"\n    }\n}   ",
+        "options": {}
+      },
+      "id": "0635bdb4-d973-4c35-8e95-5ac8c079ef3d",
+      "name": "MSG 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        1000
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c4ce0a0-2668-4893-9b46-8aad0cd5c4d6",
+              "name": "whatsantigo",
+              "value": "={{ $json.whatsapp }}",
+              "type": "string"
+            },
+            {
+              "id": "38c5b718-8728-40dc-9540-5cbfa1a08960",
+              "name": "whatsmodificado",
+              "value": "={{ \"+\" + $json.whatsapp.replace(/\\D/g,'').replace(/^(\\d{2})(\\d{5})(\\d{4})$/, '55$1$2$3').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d210f801-4247-4091-9088-5471f720c6fb",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -440,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e97fc246-a476-4594-a017-282e2d2a5298",
+              "name": "nome",
+              "value": "={{ $json.body.customer.name }}",
+              "type": "string"
+            },
+            {
+              "id": "929916b8-86bf-4a66-8340-b50e711af18e",
+              "name": "produto",
+              "value": "={{ $json.body.products[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "f06b9ff0-7e29-487e-a8dd-30234cfba541",
+              "name": "whatsapp",
+              "value": "={{ $json.body.customer.phone_number }}",
+              "type": "string"
+            },
+            {
+              "id": "ed0fabeb-d341-4b19-b964-a5558c114560",
+              "name": "email",
+              "value": "={{ $json.body.customer.email }}",
+              "type": "string"
+            },
+            {
+              "id": "52b75e5b-beaa-4722-9dc2-6e2dc2bb9e6b",
+              "name": "Status",
+              "value": "={{ $json.body.status }}",
+              "type": "string"
+            },
+            {
+              "id": "d5ca4267-c141-40bc-98cc-91667d986686",
+              "name": "checkoutlink",
+              "value": "={{ $json.body.checkout_url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e7d43b46-9e23-4777-a5e2-300cd1b21e58",
+      "name": "Informações",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -560,
+        1060
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "carrinhoabandonado",
+        "options": {}
+      },
+      "id": "641b6ea3-d9a2-43c4-8e45-93db15b359fd",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        1220
+      ],
+      "webhookId": "80e8ab35-fa2b-4aec-b294-1360ea4f455d"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.ygorarts.com.br",
+            "user-agent": "axios/1.7.2",
+            "content-length": "1449",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "baggage": "sentry-environment=production,sentry-public_key=894f284f41064dcaa15f50a785a55ff7,sentry-trace_id=8fac1ca2fba023230294c8eddc2c3c4a,sentry-sampled=false",
+            "content-type": "application/json",
+            "sentry-trace": "8fac1ca2fba023230294c8eddc2c3c4a-48e1631f52aa5c97-0",
+            "x-forwarded-for": "54.160.206.24",
+            "x-forwarded-host": "n8n.ygorarts.com.br",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "181667d02196",
+            "x-real-ip": "54.160.206.24"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "ABANDONED_CART",
+            "event_description": "Carrinho abandonado",
+            "checkout_id": "Q8J1N6K3",
+            "checkout_url": "https://pay.kirvano.com/recovery/122f02b9-0cbd-42ff-8d55-5ae03a60924d",
+            "total_price": "R$ 169,80",
+            "type": "ONE_TIME",
+            "status": "ABANDONED_CART",
+            "created_at": "2024-07-31 10:12:16",
+            "customer": {
+              "name": "João da Silva",
+              "document": "23875090127",
+              "email": "exemplo@email.com",
+              "phone_number": "SEUNUMERO"
+            },
+            "products": [
+              {
+                "id": "12fad268-f8db-4123-86ca-6f090340050f",
+                "name": "Mercado de Ações no Brasil",
+                "offer_id": "946ebf96-22e0-47fd-9f36-055686608a66",
+                "offer_name": "Mercado de Ações no Brasil",
+                "description": "Conheça os principais conceitos de renda variável e o funcionamento dos mercados",
+                "price": "R$ 119,90",
+                "photo": "https://s3.amazonaws.com/production.kirvano.com/products/05b1e79f-efce-435c-935f-c918849e5b21/cover-1722431536246.jpg",
+                "is_order_bump": false
+              },
+              {
+                "id": "3c26ef09-999f-4ede-96e3-80018866bdce",
+                "name": "Excel para Investidores",
+                "offer_id": "c0f4c455-12bf-496d-9026-9085d83e35d1",
+                "offer_name": "Excel para Investidores",
+                "description": "O melhor curso para quem quer começar a investir e ainda aprender a gerenciar sua carteira.",
+                "price": "R$ 49,90",
+                "photo": "https://s3.amazonaws.com/production.kirvano.com/products/6ef54e62-2ad0-4e66-a62f-b4b69e5b5c36/cover-1722431536246.jpg",
+                "is_order_bump": true
+              }
+            ],
+            "utm": {
+              "src": "google",
+              "utm_source": "broadcast",
+              "utm_medium": "email",
+              "utm_campaign": "register",
+              "utm_term": "codes",
+              "utm_content": "link"
+            }
+          },
+          "webhookUrl": "https://n8n.ygorarts.com.br/webhook-test/carrinhoabandonado",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "MSG 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informações": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Informações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7eee9ba7-061c-416c-9fd8-86d2a2fe36ef",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "91f035b8b7855b598d034a46f2575d867074c55f36bf69bacabaddd3afa378d2"
+  },
+  "id": "RMwgKf14O3UVo7nS",
+  "tags": []
+}

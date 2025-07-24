@@ -1,0 +1,536 @@
+{
+  "name": "Disparador de mensagens em massa",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cd1d2dc5-8680-496c-a626-8c1a32f3a2be",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        520,
+        760
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "aff4399a-7867-48dc-aa3d-e81c81857c77",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0",
+          "mode": "list",
+          "cachedResultName": "nao compradores mago",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1142382672,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0/edit#gid=1142382672"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Obtem todos os contatos').item.json.row_number }}",
+            "Status": "Enviado"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "NOME",
+              "displayName": "NOME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "WHATSAPP",
+              "displayName": "WHATSAPP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Disparar para Todos",
+              "displayName": "Disparar para Todos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "085082c7-d964-43f9-8a54-f35ca816db88",
+      "name": "Atualiza Sucesso",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        1780,
+        640
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tTzcrOLcvE9QOn7V",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0",
+          "mode": "list",
+          "cachedResultName": "nao compradores mago",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1142382672,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0/edit#gid=1142382672"
+        },
+        "options": {}
+      },
+      "id": "155c0eb5-5148-4d79-bd82-1b9e36057fb5",
+      "name": "Obtem todos os contatos",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        800,
+        760
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tTzcrOLcvE9QOn7V",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "1ecda2db-5320-43e1-80fa-0ae77484561a",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2140,
+        800
+      ],
+      "webhookId": "2987fe5c-e96e-433b-ba83-c95cadc6d0c9"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Envio Iniciado com Sucesso. Verifique o progresso na Planilha.",
+        "options": {}
+      },
+      "id": "e6e1f87c-f06c-4c3d-bf25-529fcf531a37",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        900,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "4d416909-248a-445a-bb96-bfdc4115a199",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        760
+      ],
+      "webhookId": "2987fe5c-e96e-433b-ba83-c95cadc6d0c9"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0",
+          "mode": "list",
+          "cachedResultName": "nao compradores mago",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1142382672,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cnpxyMrj-M6YqkOQu0wA9Gy_67Nd4aAnselS-iVyyF0/edit#gid=1142382672"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Obtem todos os contatos').item.json.row_number }}",
+            "Status": "Não enviado"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "NOME",
+              "displayName": "NOME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "WHATSAPP",
+              "displayName": "WHATSAPP",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Disparar para Todos",
+              "displayName": "Disparar para Todos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4b9c4428-07de-4125-a815-efce84108385",
+      "name": "Não Enviado",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        1800,
+        980
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "tTzcrOLcvE9QOn7V",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "(SUA URL EVO)/message/sendText/(INSTANCIA)",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "(APIKEY)"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $json.key.remoteJid }}\",\n    \"text\": \"(SEU TEXTO)\"\n}",
+        "options": {}
+      },
+      "id": "7f46327b-f3be-4159-b385-0fa0c75e514b",
+      "name": "Evolution 2.1.0 - Texto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1560,
+        760
+      ],
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "( SUA URL EVO)/message/sendMedia/(INSTANCIA)",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "(APIKEY)"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $json.WHATSAPP }}\",\n    \"mediatype\": \"image\",\n    \"mimetype\": \"image/png\",\n    \"media\": \"(SUA IMG URL)\",\n    \"fileName\": \"Imagem.png\"\n}\n",
+        "options": {}
+      },
+      "id": "4b38c5b2-479b-42bf-b54c-5e131e23ff7b",
+      "name": "Evolution 2.1.0 - Imagem, vídeo ou documento1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        760
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "path": "b6d9ff8f-c9a0-4a24-9ec7-e171cdcc43bd",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0b5ebcdc-00b9-4004-aade-e80fd086d98b",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        720,
+        440
+      ],
+      "webhookId": "b6d9ff8f-c9a0-4a24-9ec7-e171cdcc43bd",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Webhook ( Botão direito > Ativar )\n**Código abaixo do Disparar para todos** \n=HYPERLINK(\"SUA URL N8N\";\"Disparar para Todos\")",
+        "height": 298.64097741911587,
+        "width": 466.31226259430105
+      },
+      "id": "5941ec2d-e405-4752-87d2-09e10bd74543",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Manual",
+        "height": 213.41086834998737,
+        "width": 211.58996364362372
+      },
+      "id": "1f858354-7d1b-4208-b9b1-b975d1bb4050",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        463.1832552616919,
+        711.5932916180684
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Evolution 2.1.0 - Imagem, vídeo ou documento1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Atualiza Sucesso": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtem todos os contatos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Evolution 2.1.0 - Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Não Enviado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution 2.1.0 - Texto": {
+      "main": [
+        [
+          {
+            "node": "Atualiza Sucesso",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Não Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution 2.1.0 - Imagem, vídeo ou documento1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Obtem todos os contatos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "48dccaab-31eb-446e-a9a4-7ff46a897191",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "40b197cac73d5026b4e5b9a6528243b71f3db0ce5763cdd1701e641c48e959b9"
+  },
+  "id": "lwH0MwvCic4Le6gR",
+  "tags": []
+}

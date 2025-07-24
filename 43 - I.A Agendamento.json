@@ -1,0 +1,1777 @@
+{
+  "name": "IA  Agendamento Aula",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Credenciais').item.json.baseUrl }}/message/sendText/{{ $('Credenciais').item.json.instancia }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Credenciais').item.json.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"number\": \"{{ $('Credenciais').item.json.WhatsApp }}\",\n  \"text\": \"{{ $json.output.replace(/\\n/g, '\\\\n').replace(/\\\"/g, '\\\\\"').trim() }}\"\n}\n",
+        "options": {}
+      },
+      "id": "22e963e5-fc7a-4946-8078-41bd44448f74",
+      "name": "Enviar Mensagem WhatsApp Lead6",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3380,
+        980
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f8e1fbf-9134-4b48-be29-066509e021f5",
+              "name": "telefone",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "59fd3a53-08be-41db-b91e-9abccd7ef4ad",
+              "name": "Audio",
+              "value": "={{ $json.text || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "1f3efabc-087b-4843-8766-742b9109e955",
+              "name": "WhatsWeb",
+              "value": "={{ $json.pergunta || ''}}",
+              "type": "string"
+            },
+            {
+              "id": "60d6b895-fea6-4d7f-932a-b8771c97242e",
+              "name": "WhatsAppApp",
+              "value": "={{ $json.mensagem || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "f45d0d25-8456-4a53-9290-69eed044964e",
+              "name": "Imagem",
+              "value": "={{ $json.content || ''}}",
+              "type": "string"
+            },
+            {
+              "id": "0d9377f3-acbb-49ed-9254-ef9e3e561465",
+              "name": "Documento",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "aba47619-c0e3-409f-a18f-c9c98078aa38",
+      "name": "Filtra Webhook",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1700,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 6
+      },
+      "id": "2d807d2d-ce63-4cfb-bc96-9279c71809ea",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1980,
+        720
+      ],
+      "webhookId": "af62cbc2-1f05-47e0-8b03-7755c553a1c0"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "mensagem",
+        "key": "={{ $json.telefone }}",
+        "options": {}
+      },
+      "id": "825bcaf5-8a69-4b83-be27-ec3a9bb5a741",
+      "name": "Puxar as Mensagens",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        960
+      ],
+      "credentials": {
+        "redis": {
+          "id": "OiUMB4ciOVde7idb",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "9e9b4155-e399-4936-a5db-2d79c8cb871f",
+              "leftValue": "={{ $json.mensagem.last() }}",
+              "rightValue": "={{ $('Filtra Webhook').item.json.Audio || $('Filtra Webhook').item.json.WhatsWeb || $('Filtra Webhook').item.json.WhatsAppApp || $('Filtra Webhook').item.json.Imagem }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "92e29cbb-4ba8-4541-99a3-7af8bf31bb8c",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2140,
+        840
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bce70488-3d4e-412d-9c28-4858906bc722",
+              "name": "mensagem",
+              "value": "={{ $('Puxar as Mensagens').item.json.mensagem.join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "abca95c7-60a4-474b-95ed-a22557fa8af7",
+              "name": "telefone",
+              "value": "={{ $('Wait').item.json.telefone }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f2fc6e7e-403e-4dfe-a8f3-90f7049df41c",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2300,
+        720
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "270ed891-0986-4ed9-90c9-f005f32572ad",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2300,
+        980
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $json.telefone }}"
+      },
+      "id": "0fc02479-b38f-4582-8742-3f68a480e2e9",
+      "name": "Redis",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2500,
+        820
+      ],
+      "credentials": {
+        "redis": {
+          "id": "OiUMB4ciOVde7idb",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "e9cfbb7c-eca2-4141-bb41-534302e3380b",
+      "name": "Calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7c2ceaf6-f73c-42cd-b157-2d7009a148c7",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        2680,
+        920
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "2Wn4ZlGC30GW12Fg",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3b782978-e279-49f8-b756-6dcd46d6c3c0",
+      "name": "Embeddings OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        1160
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "2Wn4ZlGC30GW12Fg",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "d51492b6-62ba-4cf6-a3a0-9a1b4e65fccb",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        920,
+        1380
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "https://drive.google.com/file/d/1MxAkFKo8Z9tMaHrG2bd3eWxXFnpeOP5S/view?usp=sharing",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "id": "857d6ea4-8174-4d34-99e4-1a4c51cb2654",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        1380
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hIf1ub4KefOVFb3d",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "7224a5a5-8f54-425d-a6dc-c89f402dd874",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "position": [
+        1380,
+        1580
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "chunkSize": 3000,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "3507b948-f769-44bd-a856-f44bc4bf7520",
+      "name": "Recursive Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "position": [
+        1380,
+        1720
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "2f0a7cb3-18bd-4033-b5e8-90d7442a4983",
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "position": [
+        1260,
+        1620
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "openAiApi": {
+          "id": "2Wn4ZlGC30GW12Fg",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "dentista",
+        "description": "Use essa ferramenta para buscar informações sobre procedimentos e serviços."
+      },
+      "id": "393d20d2-1a8b-4329-8271-6e48e5f27985",
+      "name": "Vector Store Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        2940,
+        920
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "111e201d-7e3c-47d6-8fb2-234aaadd8258",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        3160,
+        1060
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "2Wn4ZlGC30GW12Fg",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Credenciais').item.json.baseUrl }}/chat/getBase64FromMediaMessage/{{ $('Credenciais').item.json.instancia }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $json.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"message\": {\n        \"key\": {\n            \"id\":  \"{{ $json.body.data.key.id }}\"\n        }\n    },\n    \"convertToMp4\": true\n} ",
+        "options": {}
+      },
+      "id": "d42d7dac-28cb-41f5-8d5e-dafecfff9cbc",
+      "name": "Mensagem de Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1200,
+        480
+      ],
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "audio",
+          "mimeType": "={{ $json.mimetype }}"
+        }
+      },
+      "id": "f4677b16-00d7-4028-b93b-123e4501c34c",
+      "name": "Converter Áudio",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6b7bef37-abbe-4207-aae0-5447388019a3",
+              "name": "baseUrl",
+              "value": "( url evo )",
+              "type": "string"
+            },
+            {
+              "id": "67c50f2f-89e2-4a5c-84c2-c2ac76962f6e",
+              "name": "apikey",
+              "value": "( api key )",
+              "type": "string"
+            },
+            {
+              "id": "9177d222-437a-4284-a96f-115fba66662c",
+              "name": "instancia",
+              "value": "( instancia )",
+              "type": "string"
+            },
+            {
+              "id": "ab90e3ce-3657-4124-968d-37c0aaebd5ab",
+              "name": "xi-api-key",
+              "value": "( Api Elevenn  Voz)",
+              "type": "string"
+            },
+            {
+              "id": "8d6c586e-0f00-4100-bc40-231cda7f93b7",
+              "name": "WhatsApp",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "14ef6b37-ab96-43d6-9b5c-86c8c0073674",
+      "name": "Credenciais",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        640,
+        820
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "17694db0-6248-444f-afb9-ff7ed13996ef",
+              "name": "pergunta",
+              "value": "={{ $('Webhook').item.json.body.data.message.extendedTextMessage.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f5891d33-c7b5-45d7-9316-3569b9f524e1",
+      "name": "Texto Web",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        1180,
+        640
+      ],
+      "notesInFlow": false,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f8e1fbf-9134-4b48-be29-066509e021f5",
+              "name": "telefone",
+              "value": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+              "type": "string"
+            },
+            {
+              "id": "a6004904-d9e1-4627-be79-d2a5b073d44f",
+              "name": "mensagem",
+              "value": "={{ $json.body.data.message.conversation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1ed188db-91b9-4521-9acc-430cbf2f9b01",
+      "name": "Filta Msg App",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1180,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Credenciais').item.json.baseUrl }}/chat/getBase64FromMediaMessage/{{ $('Credenciais').item.json.instancia }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Credenciais').item.json.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"message\": {\n        \"key\": {\n            \"id\":  \"{{ $json.body.data.key.id }}\"\n        }\n    },\n    \"convertToMp4\": true\n} ",
+        "options": {}
+      },
+      "id": "a825859a-2ac0-451f-8f24-beab6dfb80cc",
+      "name": "Envio de Imagens",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1180,
+        940
+      ],
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "image",
+          "mimeType": ""
+        }
+      },
+      "id": "07950d07-ddc9-4dca-a794-2f0d8ce72284",
+      "name": "Converter Imagem",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1320,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $json.telefone }}",
+        "messageData": "={{ $json.Audio || $json.WhatsWeb || $json.WhatsAppApp || $json.Imagem || $json.mensagem}}",
+        "tail": true
+      },
+      "id": "fcfeb044-42df-41b8-808e-30cf782cf443",
+      "name": "Lista Mensagens1",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1740,
+        960
+      ],
+      "credentials": {
+        "redis": {
+          "id": "OiUMB4ciOVde7idb",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "c44495e8-6f93-4147-85f2-13ee0266e554",
+      "name": "Extrair Dados",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1500,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Credenciais').item.json.baseUrl }}/chat/getBase64FromMediaMessage/{{ $('Credenciais').item.json.instancia }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Credenciais').item.json.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"message\": {\n        \"key\": {\n            \"id\":  \"{{ $json.body.data.key.id }}\"\n        }\n    },\n    \"convertToMp4\": true\n} ",
+        "options": {}
+      },
+      "id": "6aa6cb5d-1124-4d75-994e-5d70392b59f2",
+      "name": "Envio de Documentos1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1180,
+        1100
+      ],
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base64",
+        "options": {
+          "fileName": "=image {{ $('Switch').item.json.body.data.message.documentMessage.fileName }}",
+          "mimeType": "={{ $('Switch').item.json.body.data.message.documentMessage.mimetype }}"
+        }
+      },
+      "id": "0619a78b-ce8d-4282-899c-d63bcb04823d",
+      "name": "Converter Arquivo1",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1340,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Filtra as Mensagens",
+        "height": 830.5893065371872,
+        "width": 1231.9510817704675,
+        "color": 5
+      },
+      "id": "d2d6864c-e0d4-4bd0-87d8-a96d64b43bb7",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        455.67425830286265,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Concatenação de Mensagens",
+        "height": 830.15644164636,
+        "width": 952.7060569889857,
+        "color": 6
+      },
+      "id": "4f2fa7a7-88fc-4ae2-9867-2c45b4fc3463",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "content": "IA",
+        "height": 828.8267661669029,
+        "width": 1031.7647951328638,
+        "color": 4
+      },
+      "id": "49da3590-a163-4cdf-8d2f-bb3e9e5b12c2",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2629.362596164344,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Database Informações",
+        "height": 517.6827039739503,
+        "width": 864.1985100368698,
+        "color": 3
+      },
+      "id": "e2d423d2-fc9e-4d23-82b1-2bd20454fb14",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        840,
+        1340
+      ]
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.telefone }}"
+      },
+      "id": "81d2f3d6-9a9a-4ccc-b81c-881ab70ca76f",
+      "name": "Redis Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.3,
+      "position": [
+        2780,
+        920
+      ],
+      "credentials": {
+        "redis": {
+          "id": "OiUMB4ciOVde7idb",
+          "name": "Redis account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "101c3ff7-e997-43bb-8e99-fe82746c5993",
+                    "leftValue": "={{ $json.body.data.message.audioMessage }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audioMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "4b94d2ac-53e5-4153-9377-4cc6db20cb1c",
+                    "leftValue": "={{ $json.body.data.message.extendedTextMessage }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "extendedTextMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "38226af4-80fe-4155-9ceb-2379f44e29ed",
+                    "leftValue": "={{ $json.body.data.message.conversation }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "conversation"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "300366d9-2416-4cf4-93c3-e48c8761c60f",
+                    "leftValue": "={{ $json.body.data.message.imageMessage }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imageMessage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "f33566fd-3eb9-45f4-934a-3a39e2adca6c",
+                    "leftValue": "={{ $json.body.data.message.documentWithCaptionMessage.message.documentMessage }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "documentMessage"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "id": "5c647e61-72f2-4cd9-95e7-9c6629cd55ea",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        820,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/onwK4e9ZLuTAKqWW03F9",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "audio/mpeg"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "xi-api-key",
+              "value": "={{ $('Credenciais').item.json['xi-api-key'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"text\": \"{{ $json.output.replace(/\\n/g, '\\\\n').replace(/\\\"/g, '\\\\\\\\\"').replace(/\\*/g, '').replace(/\\s+/g, ' ').trim() }}\",\n    \"model_id\": \"eleven_multilingual_v2\",\n    \"voice_settings\": {\n        \"stability\": 0.5,\n        \"similarity_boost\": 0.5\n    }\n}",
+        "options": {}
+      },
+      "id": "2216b2d0-2150-46e2-8002-8008fa2c2b4c",
+      "name": "ElevenLabs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3140,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "id": "4eb7c8a6-8fe7-4244-9b77-5652bae925d3",
+      "name": "Extract from File",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        3320,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Credenciais').item.json.baseUrl }}/message/sendWhatsAppAudio/{{ $('Credenciais').item.json.instancia }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Credenciais').item.json.apikey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\t\"number\": \"{{ $('Webhook').item.json.body.data.key.remoteJid }}\",\n\t\"options\": {\n\t\t\"delay\": 1200,\n\t\t\"presence\": \"recording\",\n        \"encoding\": true\n\t},\n\t\"audioMessage\": {\n\t\t\"audio\": \"{{ $json.data }}\"\n\t}\n}",
+        "options": {}
+      },
+      "id": "f0f4d469-2c1f-48db-95c8-472db9bdfb94",
+      "name": "sendWhatsAppAudio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3500,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Responde em Áudio\n",
+        "height": 239.1747914011388,
+        "width": 543.7432906480047,
+        "color": 3
+      },
+      "id": "653f6b0a-dcb1-4501-a02e-e34de878166d",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Responde em Texto\n",
+        "height": 239.1747914011388,
+        "width": 249.0313820540327
+      },
+      "id": "2a068114-2985-460e-b0b0-e41db3e76b3c",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3320,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "d4bb134d-23c2-40e8-b06b-4a6c8d75aaa7",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.3,
+      "position": [
+        1500,
+        480
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "2Wn4ZlGC30GW12Fg",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "use essa ferramenta para enviar imagem de como passar fio dental",
+        "method": "POST",
+        "url": "(baseurl)/message/sendMedia/(instancia)",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "apikey",
+              "valueProvider": "fieldValue",
+              "value": "(apikey)"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $json.telefone }}\",\n    \"mediatype\": \"image\",\n    \"mimetype\": \"image/jpeg\",\n    \"media\": \"https://i.postimg.cc/bYxh0sr4/e385fd5d-f94f-4a87-af28-69452ddd0750.jpg\",\n    \"fileName\": \"Imagem.jpg\"\n}"
+      },
+      "id": "989d7673-e3c2-4d49-81de-c1b8eab4ff4d",
+      "name": "HTTP Request",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        2980,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "text": "Analise essa imagem, oque tem nela?",
+        "inputType": "base64",
+        "options": {}
+      },
+      "id": "4ae41dc9-1ec9-4fd8-b3d5-0672aba04d70",
+      "name": "OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.3,
+      "position": [
+        1460,
+        940
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "2Wn4ZlGC30GW12Fg",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Exemplo de Tool de envio de imagem\n",
+        "height": 205.69487706103345
+      },
+      "id": "91ec8cdf-b3f5-4c10-a21c-12ac4e3a175b",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        254
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Agendamentos\n",
+        "height": 183.7289063119872,
+        "width": 422.6074912357905,
+        "color": 3
+      },
+      "id": "870aa24e-a1b6-433e-a58f-4963c28350c3",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        1300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "delete"
+      },
+      "id": "e353790a-c82d-4ace-9376-7a8920b5971e",
+      "name": "Chat Memory Manager",
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        1980,
+        1420
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "Limpa Memória",
+        "height": 304.83247531487484,
+        "width": 415.33068089188083,
+        "color": 7
+      },
+      "id": "fb3d4169-5fa5-49ab-bc35-788693bc3869",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        1320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "956a8d60d36c50009693bb721a1e6172ac4638ac706c3192d615a2570d2f1076@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Aula Mago"
+        },
+        "eventId": "={{ $fromAI(\"Event_ID\",\"Id do evento que deve ser excluído\") }}",
+        "options": {}
+      },
+      "id": "03d64c0f-0342-4536-806e-fcd443c3303d",
+      "name": "Deletar Evento1",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.1,
+      "position": [
+        2760,
+        1360
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "BRU0uDvkqqiTKNqA",
+          "name": "Google Calendar account 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "956a8d60d36c50009693bb721a1e6172ac4638ac706c3192d615a2570d2f1076@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Aula Mago"
+        },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $fromAI(\"Initital_DateTime\", \"Data e hora inicial da consulta Ex.: 2024-10-17 00:00:00\") }}",
+          "timeMax": "={{ $fromAI(\"Final_DateTime\", \"Data e hora final da consulta Ex.: 2024-10-17 00:00:00\") }}",
+          "timeZone": {
+            "__rl": true,
+            "value": "America/Sao_Paulo",
+            "mode": "list",
+            "cachedResultName": "America/Sao_Paulo"
+          }
+        }
+      },
+      "id": "6ae47cae-b7a4-4d47-84f8-a6e931a0d268",
+      "name": "Buscar Eventos1",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.1,
+      "position": [
+        2900,
+        1360
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "BRU0uDvkqqiTKNqA",
+          "name": "Google Calendar account 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "956a8d60d36c50009693bb721a1e6172ac4638ac706c3192d615a2570d2f1076@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Aula Mago"
+        },
+        "start": "={{ $fromAI(\"Start_Time\",\"Horário inicial do evento ex.:2024-10-08 00:00:00\") }}",
+        "end": "={{ $fromAI(\"End_Time\",\"Horário final do evento ex.:2024-10-08 00:01:00\") }}",
+        "additionalFields": {}
+      },
+      "id": "3e7aa387-3038-427b-b0c4-826bf6341f0c",
+      "name": "Criar Eventos1",
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.1,
+      "position": [
+        3040,
+        1360
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "BRU0uDvkqqiTKNqA",
+          "name": "Google Calendar account 1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "77a63c5a-4c17-497e-b867-1e14b0737ea7",
+        "options": {}
+      },
+      "id": "3834acd9-3cad-45fd-8651-e0ad4fecb62f",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        480,
+        820
+      ],
+      "webhookId": "77a63c5a-4c17-497e-b867-1e14b0737ea7"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "dentista",
+          "mode": "list",
+          "cachedResultName": "dentista"
+        },
+        "options": {}
+      },
+      "id": "e5779124-be30-4de2-a790-bf0e281b689d",
+      "name": "Pinecone Vector Store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        1060
+      ],
+      "credentials": {
+        "pineconeApi": {
+          "id": "bjWgYyl8FrjyPXF3",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Edit Fields').item.json.mensagem }}",
+        "options": {
+          "systemMessage": "=Assistente Virtual para Clínica Odontológica - São Paulo\n\nDescrição Geral\nEste assistente virtual é projetado para gerenciar de forma eficiente e amigável os agendamentos e cancelamentos de consultas na clínica odontológica \"Sorriso Paulistano\", localizada em São Paulo. Focado em oferecer uma experiência prática e personalizada, o assistente exibe horários disponíveis, solicita o motivo da consulta antes de confirmar o agendamento e fornece todos os detalhes essenciais após a marcação. O assistente também respeita o formato brasileiro de data e hora (DD/MM/AAAA e HH) e opera no fuso horário \"America/Sao_Paulo\".\n\nInformações da Clínica\nNome: Clínica Odontológica Sorriso Paulistano\nEndereço: Avenida Paulista, 1234 - Bela Vista, São Paulo - SP, CEP 01310-100\nHorário de Funcionamento:\nSegunda a sexta-feira: das 08:00 às 18:00\nSábado: das 08:00 às 12:00\nProcedimentos Disponíveis e Valores:\nLimpeza: R$ 150\nConsulta Inicial: R$ 200\nClareamento Dental: R$ 500\nAparelho Ortodôntico: R$ 350 (consulta inicial)\nExtração de Dente: R$ 250 por dente\nOutros procedimentos: valor mediante consulta\n\nFunções do Assistente\n1. Exibir Horários Disponíveis\nObjetivo: Mostrar os horários de consulta disponíveis ao cliente, considerando um intervalo de datas informado, o fuso horário \"America/Sao_Paulo\" e o horário de funcionamento da clínica.\n\nCritérios de Exibição:\n\nExibir apenas horários futuros, a partir do momento atual.\nUtilizar o formato de data (DD/MM/AAAA) e horário (HH).\nNão solicitar o e-mail do cliente nesta etapa.\nExemplo de Resposta:\n\n📅 Data Atual: {{ $now.format('DD/MM/YYYY') }}\n\nHorários disponíveis para hoje:\n- ⏰ 08:00\n- ⏰ 09:00\n- ⏰ 10:00\n- ⏰ 11:00\n- (continuar listagem conforme disponibilidade...)\n\nPor favor, informe o horário desejado e o motivo da consulta (ex: Limpeza, Consulta Inicial, Clareamento, etc.) para prosseguir com o agendamento! 😊\n\n2. Solicitar Motivo da Consulta\nAntes de realizar o agendamento, o assistente deve:\n\nPerguntar ao cliente o motivo da consulta. Exemplos incluem: Limpeza, Consulta Inicial, Clareamento Dental, Aparelho Ortodôntico, Extração de Dente, entre outros.\nCondição: Somente após o cliente informar o motivo, o assistente poderá prosseguir para a etapa de confirmação do agendamento.\n\n3. Confirmar Agendamento\nObjetivo: Confirmar o agendamento após o cliente escolher um horário e informar o motivo da consulta.\n\nInstruções:\n\nSe o horário selecionado for para o mesmo dia, confirmar o agendamento para \"hoje\".\nCaso seja uma data futura, incluir a data e o horário do agendamento na confirmação.\nIncluir o nome do cliente e o motivo do agendamento no título do evento do Google Calendar, por exemplo: \"Consulta - João Silva - Limpeza\".\nSolicitar o e-mail do cliente para envio do link do evento e confirmação após a seleção do horário e motivo da consulta.\nDados Necessários: Nome, e-mail, data e horário do agendamento, motivo da consulta.\n\nExemplo de Resposta para Agendamento no Mesmo Dia:\n\n✅ Agendamento confirmado para hoje às [horário escolhido]! 😊\nExemplo para Data Futura:\n\n✅ Agendamento confirmado para [data escolhida] às [horário escolhido]! 😊\n\nDetalhes do seu agendamento:\n- *Endereço da Clínica:* Avenida Paulista, 1234 - Bela Vista, São Paulo - SP\n- *Data:* [data escolhida]\n- *Horário:* [horário escolhido]\n- *Motivo da Consulta:* [motivo informado pelo cliente]\n- *Link do Evento:* [incluir o link do Google Calendar]\n\nLembre-se de trazer documentos pessoais e qualquer exame recente, se aplicável. Qualquer dúvida, estamos à disposição! 😊\n4. Cancelar Agendamento\nObjetivo: Cancelar um agendamento mediante o fornecimento do ID do evento.\n\nInstruções:\n\nSolicitar o e-mail para cancelamentos, questões de confirmação de segurança.\nConfirmar o cancelamento e informar o cliente com uma mensagem clara.\nDados Necessários: e-mail de confirmação.\n\nExemplo de Resposta de Cancelamento Bem-Sucedido:\n\n✅ Agendamento cancelado com sucesso em {{ $now.format('DD/MM/YYYY') }}! 😊\n\nCaso deseje reagendar ou tenha alguma dúvida, estamos à disposição!\n\nExemplo de Erro ao Cancelar:\n\n⚠️ Erro ao cancelar. Verifique o ID e tente novamente.\n"
+        }
+      },
+      "id": "a575d98f-7749-4784-beb0-e5686cb9b9b5",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        2800,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "dentista",
+          "mode": "list",
+          "cachedResultName": "dentista"
+        },
+        "options": {
+          "clearNamespace": true
+        }
+      },
+      "id": "a61f9e9c-b072-4f10-925b-4b6f94d789a6",
+      "name": "Insert into Pinecone vector store",
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "position": [
+        1320,
+        1380
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "pineconeApi": {
+          "id": "bjWgYyl8FrjyPXF3",
+          "name": "PineconeApi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Filtra Webhook": {
+      "main": [
+        [
+          {
+            "node": "Lista Mensagens1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Puxar as Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Puxar as Mensagens": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Insert into Pinecone vector store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Insert into Pinecone vector store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Insert into Pinecone vector store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem de Audio": {
+      "main": [
+        [
+          {
+            "node": "Converter Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter Áudio": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credenciais": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Texto Web": {
+      "main": [
+        [
+          {
+            "node": "Filtra Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filta Msg App": {
+      "main": [
+        [
+          {
+            "node": "Filtra Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envio de Imagens": {
+      "main": [
+        [
+          {
+            "node": "Converter Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter Imagem": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lista Mensagens1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Dados": {
+      "main": [
+        [
+          {
+            "node": "Filtra Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envio de Documentos1": {
+      "main": [
+        [
+          {
+            "node": "Converter Arquivo1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter Arquivo1": {
+      "main": [
+        [
+          {
+            "node": "Extrair Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Mensagem de Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Texto Web",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filta Msg App",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Envio de Imagens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Envio de Documentos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "sendWhatsAppAudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Filtra Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Filtra Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Criar Eventos1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Eventos1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deletar Evento1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Credenciais",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensagem WhatsApp Lead6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1056eb04-6d5e-413c-a4cf-6173aa837b4b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "079e33df96811355e9a4b4196df7f240b7f4dcb46102b91d26bb671e95971058"
+  },
+  "id": "TQwkMam9HINdrOMT",
+  "tags": []
+}
